@@ -46,15 +46,19 @@ x-airflow-common:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__CORE__SQL_ALCHEMY_CONN: ${DATABASE_SQL_ALCHEMY_PROTOCOL}://airflow:airflow@database/airflow
-    AIRFLOW__CELERY__RESULT_BACKEND: ${DATABASE_RESULTS_BACKEND_PROTOCOL}://airflow:airflow@database/airflow
-    AIRFLOW__CELERY__BROKER_URL: ${QUEUE_BROKER_URL}
+    AIRFLOW__CORE__PARALLELISM: '2'
+    AIRFLOW__CORE__DAG__CONCURRENCY: '2'
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CELERY__RESULT_BACKEND: ${DATABASE_RESULTS_BACKEND_PROTOCOL}://airflow:airflow@database/airflow
+    AIRFLOW__CELERY__BROKER_URL: ${QUEUE_BROKER_URL}
+    AIRFLOW__CELERY__WORKER_CONCURRENCY: '2'
     AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     AIRFLOW__WEBSERVER__DAG_DEFAULT_VIEW: 'graph'
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'true'
+    AIRFLOW__WEBSERVER__WORKERS: '2'
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
@@ -263,21 +267,21 @@ services:
       - -c
       - airflow
 
-  flower:
-    <<: *airflow-common
-    command: celery flower
-    ports:
-      - 5555:5555
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    restart: always
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init:
-        condition: service_completed_successfully
+  # flower:
+  #   <<: *airflow-common
+  #   command: celery flower
+  #   ports:
+  #     - 5555:5555
+  #   healthcheck:
+  #     test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #   restart: always
+  #   depends_on:
+  #     <<: *airflow-common-depends-on
+  #     airflow-init:
+  #       condition: service_completed_successfully
 
 volumes:
   db-volume:
