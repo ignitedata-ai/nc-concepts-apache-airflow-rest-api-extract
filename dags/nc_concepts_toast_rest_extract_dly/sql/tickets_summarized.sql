@@ -1,4 +1,4 @@
-SELECT MIN(opened_date), MAX(opened_date) FROM tickets;
+DROP TABLE IF EXISTS tickets_summarized;
 
 -- Dependent on tickets and us_holidays tables
 
