@@ -161,8 +161,17 @@ class OrdersAPICalllerDBLoader(APICalllerDBLoader):
 
         return orders, order_checks, order_check_selections
 
+    def _log_min_max_created_dates(self, data_name, data):
+        created_dates = [record['createdDate'] for record in data if record.get('createdDate')]
+        if created_dates:
+            logging.info(f"Earliest Created Date for {data_name}: {min(created_dates)}")
+            logging.info(f"Latest Created Date for {data_name}: {max(created_dates)}")
+
     def load_into_mysql(self, mysql_conn_id, processed_data, table_load_info):
         orders, order_checks, order_check_selections = processed_data
+        self._log_min_max_created_dates("Orders", orders)
+        self._log_min_max_created_dates("Order Checks", order_checks)
+        self._log_min_max_created_dates("Order Check Selections", order_check_selections)
         super().load_into_mysql(mysql_conn_id, orders, table_load_info["orders"])
         super().load_into_mysql(mysql_conn_id, order_checks, table_load_info["order_checks"])
         super().load_into_mysql(mysql_conn_id, order_check_selections, table_load_info["order_check_selections"])

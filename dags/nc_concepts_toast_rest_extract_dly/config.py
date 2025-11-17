@@ -148,17 +148,7 @@ CONFIG_PROCESSED_TASKS = [
         "conn_id": MYSQL_PROCESSED_DB_CONN_ID,
         "sql_file": "sql/tickets.sql"
     },
-    {
-        "task_id": f"load_ticket_items",
-        "conn_id": MYSQL_PROCESSED_DB_CONN_ID,
-        "sql_file": "sql/ticket_items.sql"
-    },
-    {
-        "task_id": f"load_tickets_summarized",
-        "conn_id": MYSQL_PROCESSED_DB_CONN_ID,
-        "sql_file": "sql/tickets_summarized.sql",
-        "depends_on": ["load_tickets", "load_ticket_items"]
-    },
+
     {
         "task_id": f"load_busan_mart_only_staff_time_entry",
         "conn_id": MYSQL_BUSAN_MART_ONLY_DB_CONN_ID,
@@ -177,11 +167,26 @@ CONFIG_PROCESSED_TASKS = [
         "sql_file": "sql/busan_mart_only_tickets.sql",
         "depends_on": [f"load_tickets"]
     },
+
+
+    
+    {
+        "task_id": f"load_ticket_items",
+        "conn_id": MYSQL_PROCESSED_DB_CONN_ID,
+        "sql_file": "sql/ticket_items.sql",
+        "depends_on": ["load_busan_mart_only_staff_shift_summarized", "load_busan_mart_only_tickets"]
+    },
     {
         "task_id": f"load_busan_mart_only_ticket_items",
         "conn_id": MYSQL_BUSAN_MART_ONLY_DB_CONN_ID,
         "sql_file": "sql/busan_mart_only_ticket_items.sql",
         "depends_on": ["load_ticket_items"]
+    },
+    {
+        "task_id": f"load_tickets_summarized",
+        "conn_id": MYSQL_PROCESSED_DB_CONN_ID,
+        "sql_file": "sql/tickets_summarized.sql",
+        "depends_on": ["load_tickets", "load_ticket_items"]
     },
     {
         "task_id": f"load_busan_mart_only_tickets_summarized",

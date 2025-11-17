@@ -16,16 +16,19 @@ from nc_concepts_toast_rest_extract_dly import config
 
 with DAG(
     dag_id='nc_concepts_toast_rest_extract_dly',
+    # Only allow one task to run at a time to avoid overloading the API
+    max_active_runs=1,
+    concurrency=2,
     default_args={
         'owner': 'airflow',
         'depends_on_past': False,
         'email_on_failure': False,
         'email_on_retry': False,
         'retries': 1,
-        'retry_delay': timedelta(minutes=5),
+        'retry_delay': timedelta(minutes=10),
     },
     description='Extract NC Concepts Toast Data and load into MySQL daily',
-    schedule_interval='@daily',
+    schedule_interval='0 7 * * *', # Daily, midnight MST assuming Airflow is set to UTC
     start_date=datetime(2025, 11, 3),
     catchup=True,
 ) as dag:
